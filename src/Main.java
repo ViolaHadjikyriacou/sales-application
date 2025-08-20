@@ -78,28 +78,40 @@ public class Main {
     //Read the files and create the sales ArrayList
     ArrayList<Sale> allsales = new ArrayList<Sale>();
     for (String filePath : filePaths) {
+      int validLinesCount = 0;
+      int invalidLinesCount = 0;
       try {
         File dataFile = new File(filePath); 
         Scanner dataReader = new Scanner(dataFile); // Possible FileNotFoundException
         while (dataReader.hasNextLine()) {
           String dataLine = dataReader.nextLine();
           try {
-            Sale sale = Sale.extract(dataLine, formatter); // Possible IllegalArgumentException, DateTimeParseException, NumberFormatException
+            Sale sale = Sale.extract(dataLine, formatter); // Possible IllegalArgumentException, DateTimeParseException
             allsales.add(sale);
-          } catch (NumberFormatException e) {
-            System.out.println("Error parsing amount in file: " + filePath + ". The following sale will be ignored: " + dataLine);
-          } catch (IllegalArgumentException e) {
-            System.out.println("Invalid sale format in file: " + filePath + ". The following sale will be ignored: " + dataLine);
-          } catch (DateTimeParseException e) {
-            System.out.println("Error parsing date in file: " + filePath + ". The following sale will be ignored: " + dataLine);
-          }
+            validLinesCount++;
+          } catch (IllegalArgumentException | DateTimeParseException e) {
+            invalidLinesCount++;
+          } 
         }
         dataReader.close();
+        if (validLinesCount == 0 && invalidLinesCount == 0) {
+          System.out.println("File " + filePath + " is empty.");
+          System.out.println();
+        } else if (invalidLinesCount == 0) {
+          System.out.println("File " + filePath + " was processed without errors.");
+          System.out.println("Number of sales in file " + filePath + ": " + validLinesCount);
+          System.out.println();
+        } else {
+          System.out.println("Warning: Some lines in file " + filePath + " could not be processed correctly.");
+          System.out.println("File " + filePath + " was processed with " + invalidLinesCount + " invalid lines and " + validLinesCount + " valid sales.");
+          System.out.println();
+        }
       } catch (FileNotFoundException e) {
         System.out.println("File not found: " + filePath);
         System.exit(1);
       }
     }
+
 
     //Sort the sales ArrayList and print some information
     Collections.sort(allsales);
@@ -179,7 +191,7 @@ public class Main {
         continue;
       }
       rangestats = Sale.saleStatistics(rangeofsales);
-      System.out.println("For sales within the range " + startDate.format(formatter) + " - " + endDate.format(formatter) + " the statistics are:");
+      System.out.println("For sales within the range " + startDate.format(formatter) + " - " + endDate.format(formatter) + " the statistics (rounded to two decimal places) are :");
       System.out.printf("Number of sales: %d, average: %.2f, standard deviation: %.2f%n", rangeCount, rangestats[0], rangestats[1]);
       System.out.println();
 
@@ -200,15 +212,3 @@ public class Main {
     
   }
 }
-
-/*int salesCount = allsales.size();
-    if (salesCount == 0) {
-      System.out.println("No sales found.");
-      System.exit(1);
-    }
-    System.out.println("Total number of sales: " + salesCount);
-    LocalDate firstDate = allsales.get(0).getDate();
-    LocalDate lastDate = allsales.get(salesCount - 1).getDate();
-    System.out.println("Sales date range: " + firstDate.format(formatter) + " to " + lastDate.format(formatter));
-    System.out.println();
-     */
