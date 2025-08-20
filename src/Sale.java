@@ -21,7 +21,7 @@ public class Sale implements Comparable<Sale> {
     }
 
     LocalDate date = LocalDate.parse(parts[0], formatter); // Possible DateTimeParseException
-    float amount = Float.parseFloat(parts[1]); // Possible NumberFormatException
+    float amount = Float.parseFloat(parts[1]); // Possible NumberFormatException (subclass of IllegalArgumentException)
 
     return new Sale(date, amount);
   }
@@ -36,16 +36,21 @@ public class Sale implements Comparable<Sale> {
     return rangeofsales;
   }
 
-  public static double[] saleStatistics(ArrayList<Sale> rangeofsales){
+  public static double[] saleStatistics(ArrayList<Sale> rangeofsales) throws IllegalArgumentException {
+    if (rangeofsales.isEmpty()) {
+        throw new IllegalArgumentException("Cannot calculate statistics for empty sale list");
+    }
     double saleavg = 0.0d;
     double salestddev = 0.0d;
     for (Sale s : rangeofsales) {
-      saleavg += s.getAmount()/rangeofsales.size();
+      saleavg += s.getAmount();
     }
+    saleavg /= rangeofsales.size();
     if (rangeofsales.size() > 1) {
       for (Sale s : rangeofsales) {
-      salestddev += (s.getAmount() - saleavg) * (s.getAmount() - saleavg)/(rangeofsales.size() - 1);
+      salestddev += (s.getAmount() - saleavg) * (s.getAmount() - saleavg);
       }
+      salestddev /= (rangeofsales.size() - 1);
     }
     salestddev = Math.sqrt(salestddev);
     double[] salestats = {saleavg, salestddev};

@@ -128,7 +128,7 @@ public class Main {
     
 
     // Analyze sales within a date range provided by the user; allows multiple iterations
-    String next = "yes";
+    String continueAnalysis = "yes";
     LocalDate startDate;
     String startDateString;
     LocalDate endDate;
@@ -198,15 +198,15 @@ public class Main {
       // Ask if user wants to analyse a new range
       while (true) {
         System.out.print("Do you want to enter another date range? (yes/no): ");
-        next = cmdScanner.nextLine().trim().toLowerCase();
-        if (next.equals("yes") || next.equals("no")) {
+        continueAnalysis = cmdScanner.nextLine().trim().toLowerCase();
+        if (continueAnalysis.equals("yes") || continueAnalysis.equals("no")) {
             break; // valid input, exit the loop
         } else {
             System.out.println("Invalid input! Please enter 'yes' or 'no'.");
         }
       }
 
-    } while (next.equals("yes"));
+    } while (continueAnalysis.equals("yes"));
 
     cmdScanner.close();
     
